@@ -14,4 +14,3 @@ pub const WIN_CONDITIONS_BITMASKS: [u16; 8] = [
     (1u16 << 0) | (1u16 << 4) | (1u16 << 8),
     (1u16 << 2) | (1u16 << 4) | (1u16 << 6),
 ];
-
