@@ -55,4 +55,3 @@ mod tests {
         assert!(!bitboard.has_bit(0));
     }
 }
-
