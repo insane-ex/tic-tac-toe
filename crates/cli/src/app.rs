@@ -1,3 +1,5 @@
+use engine::game::Game;
+
 use super::{error::CliError, input};
 
 /// # Errors
@@ -10,6 +12,10 @@ pub fn run() -> Result<(), CliError> {
     let parsed_input = input::parse::<u16>(&input)?;
 
     println!("You entered {parsed_input}.");
+
+    let game = Game::default();
+
+    game.print_board();
 
     Ok(())
 }
