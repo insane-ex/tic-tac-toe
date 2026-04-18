@@ -10,18 +10,14 @@ use super::{error::CliError, input};
 pub fn run() -> Result<(), CliError> {
     let mut game = Game::default();
 
-    game.print_board();
+    loop {
+        game.print_board();
 
-    let input = input::read("Enter a non-negative number:")?;
-    let parsed_input = input::parse::<u16>(&input)?;
+        let raw_input = input::read("Enter a board position (1-9):")?;
+        let position = input::parse::<u16>(&raw_input)?;
 
-    if let Err(err) = game.make_move(parsed_input) {
-        eprintln!("{err}");
-
-        return Ok(());
+        if let Err(err) = game.make_move(position) {
+            eprintln!("{err}");
+        }
     }
-
-    game.print_board();
-
-    Ok(())
 }
