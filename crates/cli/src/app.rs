@@ -8,12 +8,18 @@ use super::{error::CliError, input};
 /// - Returns `CliError::Read` if reading from stdin fails.
 /// - Returns `CliError::Parse` if parsing the input fails.
 pub fn run() -> Result<(), CliError> {
+    let mut game = Game::default();
+
+    game.print_board();
+
     let input = input::read("Enter a non-negative number:")?;
     let parsed_input = input::parse::<u16>(&input)?;
 
-    println!("You entered {parsed_input}.");
+    if let Err(err) = game.make_move(parsed_input) {
+        eprintln!("{err}");
 
-    let game = Game::default();
+        return Ok(());
+    }
 
     game.print_board();
 
