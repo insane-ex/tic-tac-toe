@@ -1,6 +1,26 @@
-use std::fmt::{self, Write};
+use std::{
+    error,
+    fmt::{self, Write},
+};
 
 use super::{bitboard::Bitboard, player::Player};
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum GameError {
+    InvalidPosition,
+    PositionOccupied,
+}
+
+impl fmt::Display for GameError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            Self::InvalidPosition => "Invalid position. Please enter a position between 1 and 9",
+            Self::PositionOccupied => "This position is already occupied. Try another",
+        })
+    }
+}
+
+impl error::Error for GameError {}
 
 #[derive(Debug, PartialEq, Eq)]
 enum Cell {
@@ -70,6 +90,38 @@ impl Game {
     pub fn print_board(&self) {
         println!("{}", self.board_string());
     }
+
+    fn is_valid_position(position: u16) -> bool {
+        (0..=8).contains(&position)
+    }
+    fn is_position_occupied(&self, position: u16) -> bool {
+        (&self.bitboards[0] | &self.bitboards[1]).has(position)
+    }
+
+    /// # Errors
+    ///
+    /// - Returns `GameError::InvalidPosition` if the position is outside the valid range (1..9).
+    /// - Returns `GameError::PositionOccupied` if the selected cell is already occupied.
+    pub fn make_move(&mut self, position: u16) -> Result<(), GameError> {
+        let index = position - 1;
+
+        if !Self::is_valid_position(index) {
+            return Err(GameError::InvalidPosition);
+        }
+
+        if self.is_position_occupied(index) {
+            return Err(GameError::PositionOccupied);
+        }
+
+        let board = match self.player_turn {
+            Player::X => &mut self.bitboards[0],
+            Player::O => &mut self.bitboards[1],
+        };
+
+        board.set(index);
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -91,7 +143,7 @@ impl Default for Game {
 
 #[cfg(test)]
 mod tests {
-    use super::{Bitboard, Cell, Game, Player};
+    use super::{Bitboard, Cell, Game, GameError, Player};
 
     #[test]
     fn new_game_correctly_sets_game() {
@@ -132,5 +184,75 @@ mod tests {
             format!("{board}"),
             "+---+---+---+\n| 1 | 2 | 3 |\n+---+---+---+\n| 4 | 5 | 6 |\n+---+---+---+\n| 7 | 8 | 9 |\n+---+---+---+"
         );
+    }
+
+    #[test]
+    fn is_valid_position_returns_true() {
+        for index in 0..=8 {
+            assert!(Game::is_valid_position(index));
+        }
+    }
+
+    #[test]
+    fn is_valid_position_returns_false() {
+        assert!(!Game::is_valid_position(9));
+    }
+
+    #[test]
+    fn is_position_occupied_returns_true() {
+        let game = Game::from_bitboards(Bitboard::from_bits(0b101), Bitboard::from_bits(0b010));
+
+        assert!(game.is_position_occupied(0));
+        assert!(game.is_position_occupied(1));
+        assert!(game.is_position_occupied(2));
+    }
+
+    #[test]
+    fn is_position_occupied_returns_false() {
+        let game = Game::new();
+
+        assert!(!game.is_position_occupied(0));
+    }
+
+    #[test]
+    fn make_move_returns_invalid_position() {
+        let mut game = Game::new();
+
+        let result = game.make_move(10);
+
+        assert!(result.is_err_and(|err| err == GameError::InvalidPosition));
+    }
+
+    #[test]
+    fn make_move_returns_position_occupied() {
+        let mut game = Game::from_bitboards(Bitboard::from_bits(0b01), Bitboard::from_bits(0b01));
+
+        let result = game.make_move(1);
+
+        assert!(result.is_err_and(|err| err == GameError::PositionOccupied));
+    }
+
+    #[test]
+    fn make_move_for_player_x() {
+        let mut game = Game::new();
+
+        let _ = game.make_move(1);
+
+        assert!(game.bitboards[0].has(0));
+        assert_eq!(game.cell_at(0), Cell::Occupied(Player::X));
+    }
+
+    #[test]
+    fn make_move_for_player_o() {
+        let mut game = Game::new();
+
+        let _ = game.make_move(1);
+
+        game.player_turn = Player::O;
+
+        let _ = game.make_move(2);
+
+        assert!(game.bitboards[1].has(1));
+        assert_eq!(game.cell_at(1), Cell::Occupied(Player::O));
     }
 }

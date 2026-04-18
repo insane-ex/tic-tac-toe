@@ -58,6 +58,16 @@ impl BitOr for Bitboard {
     }
 }
 
+impl BitOr for &Bitboard {
+    type Output = Bitboard;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Bitboard {
+            bits: self.bits | rhs.bits,
+        }
+    }
+}
+
 impl Default for Bitboard {
     fn default() -> Self {
         Self::new()
