@@ -92,22 +92,28 @@ impl Game {
     }
 
     fn is_valid_position(position: u16) -> bool {
-        (0..=8).contains(&position)
+        (1..=9).contains(&position)
     }
+
     fn is_position_occupied(&self, position: u16) -> bool {
         (&self.bitboards[0] | &self.bitboards[1]).has(position)
     }
 
+    /// Places a move for the current player.
+    ///
+    /// Accepts a 1-based position (1..9) and converts it internally
+    /// to a zero-based index (0..8) used by the bitboard.
+    ///
     /// # Errors
     ///
-    /// - Returns `GameError::InvalidPosition` if the position is outside the valid range (1..9).
-    /// - Returns `GameError::PositionOccupied` if the selected cell is already occupied.
+    /// - `GameError::InvalidPosition` if position is not in 1..9.
+    /// - `GameError::PositionOccupied` if the cell is already taken.
     pub fn make_move(&mut self, position: u16) -> Result<(), GameError> {
-        let index = position - 1;
-
-        if !Self::is_valid_position(index) {
+        if !Self::is_valid_position(position) {
             return Err(GameError::InvalidPosition);
         }
+
+        let index = position - 1;
 
         if self.is_position_occupied(index) {
             return Err(GameError::PositionOccupied);
@@ -188,14 +194,15 @@ mod tests {
 
     #[test]
     fn is_valid_position_returns_true() {
-        for index in 0..=8 {
+        for index in 1..=9 {
             assert!(Game::is_valid_position(index));
         }
     }
 
     #[test]
     fn is_valid_position_returns_false() {
-        assert!(!Game::is_valid_position(9));
+        assert!(!Game::is_valid_position(0));
+        assert!(!Game::is_valid_position(10));
     }
 
     #[test]
