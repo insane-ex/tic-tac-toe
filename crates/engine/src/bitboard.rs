@@ -1,6 +1,6 @@
 use std::ops::{BitAnd, BitOr};
 
-use super::bitmask::EMPTY_BOARD_BITMASK;
+use super::bitmask::{EMPTY_BOARD_BITMASK, FULL_BOARD_BITMASK};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Bitboard {
@@ -18,6 +18,11 @@ impl Bitboard {
     #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.bits == EMPTY_BOARD_BITMASK
+    }
+
+    #[must_use]
+    pub const fn is_full(&self) -> bool {
+        self.bits == FULL_BOARD_BITMASK
     }
 
     pub const fn set(&mut self, bit: u16) {
@@ -76,7 +81,7 @@ impl Default for Bitboard {
 
 #[cfg(test)]
 mod tests {
-    use super::Bitboard;
+    use super::{Bitboard, FULL_BOARD_BITMASK};
 
     #[test]
     fn new_bitboard_is_empty() {
@@ -130,5 +135,19 @@ mod tests {
         let result = a & b;
 
         assert!(result.is_empty());
+    }
+
+    #[test]
+    fn is_full_returns_true() {
+        let bitboard = Bitboard::from_bits(FULL_BOARD_BITMASK);
+
+        assert!(bitboard.is_full());
+    }
+
+    #[test]
+    fn is_full_returns_false() {
+        let bitboard = Bitboard::new();
+
+        assert!(!bitboard.is_full());
     }
 }
