@@ -19,5 +19,15 @@ pub fn run() -> Result<(), CliError> {
         if let Err(err) = game.make_move(position) {
             eprintln!("{err}");
         }
+
+        if game.is_draw() {
+            game.print_board();
+
+            println!("It's a draw!");
+
+            break;
+        }
     }
+
+    Ok(())
 }

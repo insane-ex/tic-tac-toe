@@ -128,6 +128,11 @@ impl Game {
 
         Ok(())
     }
+
+    #[must_use]
+    pub fn is_draw(&self) -> bool {
+        (&self.bitboards[0] | &self.bitboards[1]).is_full()
+    }
 }
 
 #[cfg(test)]
@@ -261,5 +266,22 @@ mod tests {
 
         assert!(game.bitboards[1].has(1));
         assert_eq!(game.cell_at(1), Cell::Occupied(Player::O));
+    }
+
+    #[test]
+    fn is_draw_returns_true() {
+        let game = Game::from_bitboards(
+            Bitboard::from_bits(0b111_111_110),
+            Bitboard::from_bits(0b000_000_001),
+        );
+
+        assert!(game.is_draw());
+    }
+
+    #[test]
+    fn is_draw_returns_false() {
+        let game = Game::new();
+
+        assert!(!game.is_draw());
     }
 }
