@@ -145,6 +145,13 @@ impl Game {
             .iter()
             .any(|&mask| board.has_mask(mask))
     }
+
+    pub const fn switch_turn(&mut self) {
+        self.player_turn = match self.player_turn {
+            Player::X => Player::O,
+            Player::O => Player::X,
+        };
+    }
 }
 
 #[cfg(test)]
@@ -324,5 +331,25 @@ mod tests {
         let game = Game::new();
 
         assert!(!game.has_winner());
+    }
+
+    #[test]
+    fn switch_turn_switches_to_x() {
+        let mut game = Game::new();
+
+        game.player_turn = Player::O;
+
+        game.switch_turn();
+
+        assert_eq!(game.player_turn, Player::X);
+    }
+
+    #[test]
+    fn switch_turn_switches_to_o() {
+        let mut game = Game::new();
+
+        game.switch_turn();
+
+        assert_eq!(game.player_turn, Player::O);
     }
 }

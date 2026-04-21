@@ -35,6 +35,8 @@ pub fn run() -> Result<(), CliError> {
 
             break;
         }
+
+        game.switch_turn();
     }
 
     Ok(())
