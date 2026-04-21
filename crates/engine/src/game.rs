@@ -34,7 +34,6 @@ impl fmt::Display for Cell {
     }
 }
 
-#[allow(unused)]
 pub struct Game {
     bitboards: [Bitboard; 2],
     player_turn: Player,
@@ -49,24 +48,9 @@ impl Game {
         }
     }
 
-    const fn cell_at(&self, index: u16) -> Cell {
-        debug_assert!(index < 9);
-
-        if self.bitboards[0].has(index) {
-            Cell::Occupied(Player::X)
-        } else if self.bitboards[1].has(index) {
-            Cell::Occupied(Player::O)
-        } else {
-            Cell::Empty(index)
-        }
-    }
-
-    fn is_valid_position(position: u16) -> bool {
-        (1..=9).contains(&position)
-    }
-
-    fn is_position_occupied(&self, position: u16) -> bool {
-        (&self.bitboards[0] | &self.bitboards[1]).has(position)
+    #[must_use]
+    pub const fn current_player(&self) -> &Player {
+        &self.player_turn
     }
 
     /// Places a move for the current player.
@@ -100,11 +84,6 @@ impl Game {
     }
 
     #[must_use]
-    pub fn is_draw(&self) -> bool {
-        (&self.bitboards[0] | &self.bitboards[1]).is_full()
-    }
-
-    #[must_use]
     pub fn has_winner(&self) -> bool {
         let board = match self.player_turn {
             Player::X => &self.bitboards[0],
@@ -116,6 +95,11 @@ impl Game {
             .any(|&mask| board.has_mask(mask))
     }
 
+    #[must_use]
+    pub fn is_draw(&self) -> bool {
+        (&self.bitboards[0] | &self.bitboards[1]).is_full()
+    }
+
     pub const fn switch_turn(&mut self) {
         self.player_turn = match self.player_turn {
             Player::X => Player::O,
@@ -123,9 +107,30 @@ impl Game {
         };
     }
 
-    #[must_use]
-    pub const fn current_player(&self) -> &Player {
-        &self.player_turn
+    const fn cell_at(&self, index: u16) -> Cell {
+        debug_assert!(index < 9);
+
+        if self.bitboards[0].has(index) {
+            Cell::Occupied(Player::X)
+        } else if self.bitboards[1].has(index) {
+            Cell::Occupied(Player::O)
+        } else {
+            Cell::Empty(index)
+        }
+    }
+
+    fn is_valid_position(position: u16) -> bool {
+        (1..=9).contains(&position)
+    }
+
+    fn is_position_occupied(&self, position: u16) -> bool {
+        (&self.bitboards[0] | &self.bitboards[1]).has(position)
+    }
+}
+
+impl Default for Game {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -157,12 +162,6 @@ impl Game {
             bitboards: [a, b],
             player_turn: Player::X,
         }
-    }
-}
-
-impl Default for Game {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
