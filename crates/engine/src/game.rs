@@ -152,6 +152,11 @@ impl Game {
             Player::O => Player::X,
         };
     }
+
+    #[must_use]
+    pub const fn current_player(&self) -> &Player {
+        &self.player_turn
+    }
 }
 
 #[cfg(test)]
@@ -351,5 +356,21 @@ mod tests {
         game.switch_turn();
 
         assert_eq!(game.player_turn, Player::O);
+    }
+
+    #[test]
+    fn current_player_returns_x() {
+        let game = Game::new();
+
+        assert_eq!(game.current_player(), &Player::X);
+    }
+
+    #[test]
+    fn current_player_returns_o() {
+        let mut game = Game::new();
+
+        game.switch_turn();
+
+        assert_eq!(game.current_player(), &Player::O);
     }
 }

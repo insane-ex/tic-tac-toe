@@ -31,7 +31,7 @@ pub fn run() -> Result<(), CliError> {
         if game.has_winner() {
             game.print_board();
 
-            println!("It's a won!");
+            println!("Player '{}' has won!", game.current_player());
 
             break;
         }
