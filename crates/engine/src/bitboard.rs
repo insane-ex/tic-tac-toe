@@ -33,6 +33,11 @@ impl Bitboard {
     pub const fn has(&self, bit: u16) -> bool {
         (self.bits & (1 << bit)) != 0
     }
+
+    #[must_use]
+    pub const fn has_mask(&self, mask: u16) -> bool {
+        (self.bits & mask) == mask
+    }
 }
 
 #[cfg(test)]
@@ -149,5 +154,19 @@ mod tests {
         let bitboard = Bitboard::new();
 
         assert!(!bitboard.is_full());
+    }
+
+    #[test]
+    fn has_mask_returns_true() {
+        let bitboard = Bitboard::from_bits(0b000_000_111);
+
+        assert!(bitboard.has_mask(0b111));
+    }
+
+    #[test]
+    fn has_mask_returns_false() {
+        let bitboard = Bitboard::new();
+
+        assert!(!bitboard.has_mask(0b111));
     }
 }
