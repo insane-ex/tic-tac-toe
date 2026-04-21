@@ -1,7 +1,4 @@
-use std::{
-    error,
-    fmt::{self, Write},
-};
+use std::{error, fmt};
 
 use super::{bitboard::Bitboard, bitmask::WIN_CONDITIONS_BITMASKS, player::Player};
 
@@ -62,33 +59,6 @@ impl Game {
         } else {
             Cell::Empty(index)
         }
-    }
-
-    fn board_string(&self) -> String {
-        let mut buffer = String::new();
-
-        buffer.push_str("+---+---+---+\n");
-
-        for row in 0..3 {
-            buffer.push('|');
-
-            for column in 0..3 {
-                let cell_idx = row * 3 + column;
-                let _ = write!(buffer, " {} |", self.cell_at(cell_idx));
-            }
-
-            buffer.push_str("\n+---+---+---+");
-
-            if row != 2 {
-                buffer.push('\n');
-            }
-        }
-
-        buffer
-    }
-
-    pub fn print_board(&self) {
-        println!("{}", self.board_string());
     }
 
     fn is_valid_position(position: u16) -> bool {
@@ -159,6 +129,26 @@ impl Game {
     }
 }
 
+impl fmt::Display for Game {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "+---+---+---+")?;
+
+        for row in 0..3 {
+            write!(f, "\n|")?;
+
+            for column in 0..3 {
+                let cell_idx = row * 3 + column;
+
+                write!(f, " {} |", self.cell_at(cell_idx))?;
+            }
+
+            write!(f, "\n+---+---+---+")?;
+        }
+
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 impl Game {
     #[must_use]
@@ -213,10 +203,9 @@ mod tests {
     #[test]
     fn board_string_returns_correct_board_representation() {
         let game = Game::new();
-        let board = game.board_string();
 
         assert_eq!(
-            format!("{board}"),
+            format!("{game}"),
             "+---+---+---+\n| 1 | 2 | 3 |\n+---+---+---+\n| 4 | 5 | 6 |\n+---+---+---+\n| 7 | 8 | 9 |\n+---+---+---+"
         );
     }
