@@ -27,6 +27,14 @@ pub fn run() -> Result<(), CliError> {
 
             break;
         }
+
+        if game.has_winner() {
+            game.print_board();
+
+            println!("It's a won!");
+
+            break;
+        }
     }
 
     Ok(())

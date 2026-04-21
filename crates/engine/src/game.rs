@@ -3,7 +3,7 @@ use std::{
     fmt::{self, Write},
 };
 
-use super::{bitboard::Bitboard, player::Player};
+use super::{bitboard::Bitboard, bitmask::WIN_CONDITIONS_BITMASKS, player::Player};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum GameError {
@@ -132,6 +132,18 @@ impl Game {
     #[must_use]
     pub fn is_draw(&self) -> bool {
         (&self.bitboards[0] | &self.bitboards[1]).is_full()
+    }
+
+    #[must_use]
+    pub fn has_winner(&self) -> bool {
+        let board = match self.player_turn {
+            Player::X => &self.bitboards[0],
+            Player::O => &self.bitboards[1],
+        };
+
+        WIN_CONDITIONS_BITMASKS
+            .iter()
+            .any(|&mask| board.has_mask(mask))
     }
 }
 
@@ -283,5 +295,34 @@ mod tests {
         let game = Game::new();
 
         assert!(!game.is_draw());
+    }
+
+    #[test]
+    fn has_winner_returns_true_and_its_x() {
+        let game = Game::from_bitboards(
+            Bitboard::from_bits(0b000_000_111),
+            Bitboard::from_bits(0b000_000_000),
+        );
+
+        assert!(game.has_winner());
+    }
+
+    #[test]
+    fn has_winner_returns_true_and_its_o() {
+        let mut game = Game::from_bitboards(
+            Bitboard::from_bits(0b000_000_000),
+            Bitboard::from_bits(0b000_000_111),
+        );
+
+        game.player_turn = Player::O;
+
+        assert!(game.has_winner());
+    }
+
+    #[test]
+    fn has_winner_returns_false() {
+        let game = Game::new();
+
+        assert!(!game.has_winner());
     }
 }
