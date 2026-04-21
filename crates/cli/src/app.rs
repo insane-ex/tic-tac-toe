@@ -22,13 +22,11 @@ pub fn run() -> Result<(), CliError> {
 
         if game.is_draw() {
             println!("{game}\nIt's a draw!");
-
             break;
         }
 
         if game.has_winner() {
             println!("{game}\nPlayer '{}' has won!", game.current_player());
-
             break;
         }
 

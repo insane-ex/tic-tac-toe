@@ -40,11 +40,9 @@ impl Bitboard {
     }
 }
 
-#[cfg(test)]
-impl Bitboard {
-    #[must_use]
-    pub const fn from_bits(bits: u16) -> Self {
-        Self { bits }
+impl Default for Bitboard {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -78,9 +76,11 @@ impl BitOr for &Bitboard {
     }
 }
 
-impl Default for Bitboard {
-    fn default() -> Self {
-        Self::new()
+#[cfg(test)]
+impl Bitboard {
+    #[must_use]
+    pub const fn from_bits(bits: u16) -> Self {
+        Self { bits }
     }
 }
 
