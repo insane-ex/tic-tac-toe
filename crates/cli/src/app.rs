@@ -11,7 +11,7 @@ pub fn run() -> Result<(), CliError> {
     let mut game = Game::default();
 
     loop {
-        game.print_board();
+        println!("{game}");
 
         let raw_input = input::read("Enter a board position (1-9):")?;
         let position = input::parse::<u16>(&raw_input)?;
@@ -21,17 +21,13 @@ pub fn run() -> Result<(), CliError> {
         }
 
         if game.is_draw() {
-            game.print_board();
-
-            println!("It's a draw!");
+            println!("{game}\nIt's a draw!");
 
             break;
         }
 
         if game.has_winner() {
-            game.print_board();
-
-            println!("Player '{}' has won!", game.current_player());
+            println!("{game}\nPlayer '{}' has won!", game.current_player());
 
             break;
         }
