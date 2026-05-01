@@ -6,6 +6,7 @@ use super::{bitboard::Bitboard, bitmask::WIN_CONDITIONS_BITMASKS, player::Player
 pub enum GameError {
     InvalidPosition,
     PositionOccupied,
+    GameAlreadyOver,
 }
 
 impl fmt::Display for GameError {
@@ -13,6 +14,7 @@ impl fmt::Display for GameError {
         f.write_str(match self {
             Self::InvalidPosition => "Invalid position. Please enter a position between 1 and 9",
             Self::PositionOccupied => "This position is already occupied. Try another",
+            Self::GameAlreadyOver => "Game is already over. No more moves are allowed",
         })
     }
 }
@@ -63,6 +65,10 @@ impl Game {
     /// - `GameError::InvalidPosition` if position is not in 1..9.
     /// - `GameError::PositionOccupied` if the cell is already taken.
     pub fn make_move(&mut self, position: u16) -> Result<(), GameError> {
+        if self.is_over() {
+            return Err(GameError::GameAlreadyOver);
+        }
+
         if !Self::is_valid_position(position) {
             return Err(GameError::InvalidPosition);
         }
@@ -125,6 +131,10 @@ impl Game {
 
     fn is_position_occupied(&self, position: u16) -> bool {
         (&self.bitboards[0] | &self.bitboards[1]).has(position)
+    }
+
+    fn is_over(&self) -> bool {
+        self.has_winner() || self.is_draw()
     }
 }
 
@@ -257,6 +267,16 @@ mod tests {
     }
 
     #[test]
+    fn make_move_returns_game_already_over() {
+        let mut game =
+            Game::from_bitboards(Bitboard::from_bits(0b111), Bitboard::from_bits(0b10110111));
+
+        let result = game.make_move(1);
+
+        assert!(result.is_err_and(|err| err == GameError::GameAlreadyOver));
+    }
+
+    #[test]
     fn make_move_for_player_x() {
         let mut game = Game::new();
 
@@ -360,5 +380,23 @@ mod tests {
         game.switch_turn();
 
         assert_eq!(game.current_player(), &Player::O);
+    }
+
+    #[test]
+    fn is_over_returns_true() {
+        let mut game = Game::new();
+
+        let _ = game.make_move(1);
+        let _ = game.make_move(2);
+        let _ = game.make_move(3);
+
+        assert!(game.is_over());
+    }
+
+    #[test]
+    fn is_over_returns_false() {
+        let game = Game::new();
+
+        assert!(!game.is_over());
     }
 }
