@@ -1,4 +1,4 @@
-pub mod bitboard;
-pub mod bitmask;
+mod bitboard;
+mod bitmask;
 pub mod game;
 pub mod player;
