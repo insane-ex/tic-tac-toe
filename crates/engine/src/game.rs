@@ -133,7 +133,8 @@ impl Game {
         (&self.bitboards[0] | &self.bitboards[1]).has(position)
     }
 
-    fn is_over(&self) -> bool {
+    #[must_use]
+    pub fn is_over(&self) -> bool {
         self.has_winner() || self.is_draw()
     }
 }
