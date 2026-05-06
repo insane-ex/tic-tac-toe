@@ -1,6 +1,6 @@
-use engine::game::Game;
+use engine::Game;
 
-use super::{error::CliError, input};
+use super::{CliError, input};
 
 /// # Errors
 ///
