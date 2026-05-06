@@ -3,7 +3,7 @@ use std::{
     str::FromStr,
 };
 
-use super::error::CliError;
+use super::CliError;
 
 /// # Errors
 ///

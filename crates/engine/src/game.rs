@@ -1,6 +1,6 @@
 use std::{error, fmt};
 
-use super::{bitboard::Bitboard, bitmask::WIN_CONDITIONS_BITMASKS, player::Player};
+use super::{Bitboard, Player, bitmask::WIN_CONDITIONS_BITMASKS};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum GameError {

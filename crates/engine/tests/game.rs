@@ -1,4 +1,4 @@
-use engine::{game::Game, player::Player};
+use engine::{Game, Player};
 
 #[test]
 fn game_flow_player_wins_by_row() {
